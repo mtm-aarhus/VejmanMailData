@@ -18,7 +18,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
     cosmos_url = cosmos_credentials.username
     cosmos_key = cosmos_credentials.password
     database_name = "aak-tilsyn"
-    container_name = "vejman-permissions"
+    container_name = "TilsynItems"
     client = CosmosClient(cosmos_url, credential=cosmos_key)
     container = client.get_database_client(database_name).get_container_client(container_name)
 
@@ -46,7 +46,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
         end_date_raw = case_details.get("end_date") or case.get("end_date")
 
         doc = {
-            "id": case_number,
+            "id": case_id,
             "case_number": case_number,
             "case_id": case_id,
             "vejman_state": case.get("state"),
@@ -66,6 +66,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
             "street_number_text": nullable_str(street_number_text),
 
             "initials": nullable_str(case.get("initials")),
+            "type": "permission"
         }
 
         doc["content_hash"] = compute_content_hash(doc)
@@ -118,6 +119,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
             "street_name": doc.get("street_name"),
             "street_number_text": doc.get("street_number_text"),
             "initials": doc.get("initials"),
+            "type": doc.get("type")
         }
 
         raw = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -222,7 +224,7 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
             continue
 
         try:
-            existing = container.read_item(item=doc["id"], partition_key=doc["case_number"])
+            existing = container.read_item(item=doc["id"], partition_key=doc["id"])
         except CosmosResourceNotFoundError:
             existing = None
 

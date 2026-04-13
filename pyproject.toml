@@ -20,9 +20,8 @@ dependencies = [
     "Pillow == 10.*",
     "requests",
     "Office365-REST-Python-Client==2.*",
-    "azure-cosmos",
-    "pytz"
-]
+    "azure-cosmos"
+    ]
 
 
 [project.optional-dependencies]

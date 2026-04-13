@@ -1,7 +1,7 @@
 from OpenOrchestrator.orchestrator_connection.connection import OrchestratorConnection
 from OpenOrchestrator.database.queues import QueueElement
 from datetime import datetime, timedelta
-import pytz
+from zoneinfo import ZoneInfo
 import hashlib
 import json
 import requests
@@ -10,7 +10,7 @@ from azure.cosmos.exceptions import CosmosResourceNotFoundError
 
 def process(orchestrator_connection: OrchestratorConnection) -> None:
         
-    VEJMAN_TIMEZONE = pytz.timezone("Europe/Copenhagen")
+    VEJMAN_TIMEZONE = ZoneInfo("Europe/Copenhagen")
     ALLOWED_INITIALS = {"MAMASA", "LERV", "MABMO", "JKROG"}
     DRY_RUN = False
     vejman_token = orchestrator_connection.get_credential("VejmanToken").password
@@ -89,9 +89,6 @@ def process(orchestrator_connection: OrchestratorConnection) -> None:
 
 
     def vejman_datetime_to_iso(value: str | None) -> str | None:
-        """
-        Converts '25-03-2026 05:00:00' to ISO with Europe/Copenhagen offset.
-        """
         if not value:
             return None
 
